@@ -1,8 +1,9 @@
 <template>
     <div class="Editor">
+        <div id="menu"></div>
         <div id="container">
-            <div v-bind:key="i" v-for="i in ['11', '12', '21', '22']" :style="'grid-row: ' + i[0] + '; grid-column: ' + i[1]" class="box">
-              <editor ref="editwins" @init="editorInit" lang="python" theme="monokai"></editor>
+            <div class="box" v-bind:key="buffer.key" v-for="buffer in buffers">
+              <editor v-model="buffers[buffer]" ref="editwins" @init="editorInit" lang="python" theme="chrome"></editor>
             </div>
         </div>
     </div>
@@ -13,7 +14,11 @@ export default {
   name: 'Editor',
   data () {
     return {
-      windows: [0, 1, 2]
+      buffers: [
+        {id: 0, text: 'hello'},
+        {id: 1, text: 'hello'}
+      ],
+      content: 'Hello'
     }
   },
   methods: {
@@ -21,13 +26,16 @@ export default {
       require('brace/ext/language_tools')
       require('brace/mode/python')
       require('brace/theme/monokai')
+      require('brace/theme/chrome')
     }
   },
   components: {
     editor: require('vue2-ace-editor')
   },
   mounted () {
+    console.log(this.$refs)
     this.windows = this.$refs.editwins
+    this.windows[0].editor.setReadOnly(true)
     for (var i = 0; i < this.windows.length; i++) {
       this.windows[i].setReadOnly(true)
     }
@@ -37,19 +45,27 @@ export default {
 </script>
 
 <style scoped>
-* {
-    display: inline-block;
+
+.ace_editor {
+  border: solid 2px black;
+}
+
+#menu {
+  height: 10vh;
+  border: solid 2px;
+}
+
+.box {
+  padding: 1px;
 }
 
 #container {
     display: grid;
-    width: 99vw;
-    height: 98vh;
-    text-align: center;
-}
+    width: 98%;
+    height: 85vh;
+    margin: 0px auto;
 
-.box {
-  padding: 1%;
+    grid-template-columns: repeat(3, 1fr);
 }
 
 </style>

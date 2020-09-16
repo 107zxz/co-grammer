@@ -14,6 +14,6 @@ export default {
 
 <style>
 body {
-  background-color: black;
+  background-color: white;
 }
 </style>
