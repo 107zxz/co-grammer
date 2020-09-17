@@ -1,9 +1,11 @@
 <template>
     <div class="Editor">
-        <div id="menu"></div>
+        <div id="menu">
+          <button :key="buffer.id" v-for="buffer in buffers" :id="'s' + (buffer.id + 1)" v-on:click="syncBuffer">Sync Buffer {{buffer.id}}</button>
+        </div>
         <div id="container">
-            <div class="box" v-bind:key="buffer.key" v-for="buffer in buffers">
-              <editor v-model="buffers[buffer]" ref="editwins" @init="editorInit" lang="python" theme="chrome"></editor>
+            <div class="box" :key="buffer.id" v-for="buffer in buffers">
+              <editor v-model="buffers[buffer.id]['text']" ref="editwins" @init="editorInit" lang="python" theme="chrome"></editor>
             </div>
         </div>
     </div>
@@ -15,10 +17,9 @@ export default {
   data () {
     return {
       buffers: [
-        {id: 0, text: 'hello'},
-        {id: 1, text: 'hello'}
-      ],
-      content: 'Hello'
+        {id: 0, text: 'Hello'},
+        {id: 1, text: 'Goodbye'}
+      ]
     }
   },
   methods: {
@@ -27,18 +28,34 @@ export default {
       require('brace/mode/python')
       require('brace/theme/monokai')
       require('brace/theme/chrome')
+    },
+
+    syncBuffer: function (event) {
+      var options = []
+
+      if (event) {
+        console.log(event.target.innerHTML)
+        if (event.target.id === 's1') {
+          options = {buffer: this.buffers[0]}
+        }
+        if (event.target.id === 's2') {
+          options = {buffer: this.buffers[1]}
+        }
+      }
+
+      this.axios.post('http://localhost:5000/json', options).then((response) => {
+        console.log(response)
+        this.buffers = response.data.buffers
+      })
     }
   },
   components: {
-    editor: require('vue2-ace-editor')
+    editor: require('vue2-ace-editor'),
+    axios: require('axios')
   },
   mounted () {
-    console.log(this.$refs)
     this.windows = this.$refs.editwins
-    this.windows[0].editor.setReadOnly(true)
-    for (var i = 0; i < this.windows.length; i++) {
-      this.windows[i].setReadOnly(true)
-    }
+    this.syncBuffer()
   }
 }
 
