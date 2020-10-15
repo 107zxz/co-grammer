@@ -38,8 +38,11 @@ export default {
 
     // Update buffers from returned json
     updateBuffers (json) {
+      // Update each buffer
       for (var i = 0; i < json.buffers.length; i++) {
+        // If pulled buffer is more recent
         if (json.buffers[i].lastModified && json.buffers[i].lastModified > this.buffers[i].lastModified) {
+          // Update each field individually for vue.js to update correctly
           this.buffers[i].text = json.buffers[i].text
           this.buffers[i].lastModified = json.buffers[i].lastModified
           this.buffers[i].name = json.buffers[i].name
